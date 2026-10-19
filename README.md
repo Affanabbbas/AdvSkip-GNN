@@ -140,15 +140,11 @@ A review of the supplied source archive identified a distinction between the tra
 
 ## References and source attribution
 
-This package preserves the source files from the repository snapshot provided for this README update. The source code has not been rewritten as part of this packaging operation.
-
-- **Source repository:** [ibrahimkhalilsj/AdvSkip-GNN](https://github.com/ibrahimkhalilsj/AdvSkip-GNN/tree/master)
 - **GCNII reference implementation:** [chennnM/GCNII](https://github.com/chennnM/GCNII)
 - **Geom-GCN dataset source:** [graphdml-uiuc-jlu/geom-gcn](https://github.com/graphdml-uiuc-jlu/geom-gcn)
 
-**Current repository maintainer:** Affan Abbas
+**Current repository maintainer:** Muhammad Affan Abbas
 
-The source ZIP supplied for this packaging did not contain a `LICENSE` file. Before publishing or redistributing the copied source publicly, confirm permission from the original rights holder and comply with any applicable license. A public GitHub repository is not, by itself, permission to republish its code.
 
 ---
 
