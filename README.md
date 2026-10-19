@@ -64,6 +64,23 @@ The following table reports training time in seconds and the relative change cal
 
 The mean training time decreases from **923.17 seconds** for GCNII to **604.09 seconds** for AdvSkip-GNN, a **34.6% reduction** in the mean of the seven dataset-level times. The table includes per-dataset results to show how runtime varies across benchmarks.
 
+## Experimental Environment
+
+The experiments were conducted using Google Colab with Python and PyTorch. The notebook-based environment was used for model training and experimental evaluation.
+
+## Environment
+
+The project dependencies are:
+
+- Python 3.6.9
+- PyTorch 1.3.1
+- CUDA 10.1
+- NetworkX 2.1
+- scikit-learn
+- NumPy
+- SciPy
+
+
 ## Running the experiments
 
 Run commands from the repository root. The examples below reproduce the full-supervised configurations used for the reported dataset results.
@@ -80,17 +97,6 @@ python -u full-supervised.py --data cornell --layer 16 --lamda 1 --weight_decay 
 
 The complete set of full-supervised commands, including configurations that use `--variant`, is available in `full.sh`.
 
-## Environment
-
-The project dependencies are:
-
-- Python 3.6.9
-- PyTorch 1.3.1
-- CUDA 10.1
-- NetworkX 2.1
-- scikit-learn
-- NumPy
-- SciPy
 
 ## Repository structure
 
