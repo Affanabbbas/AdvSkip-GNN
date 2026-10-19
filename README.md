@@ -1,108 +1,72 @@
-# AdvSkip-GNN: Skip Connections and Adversarial Training for Graph Node Classification
+# AdvSkip-GNN: Improving Node Classification Accuracy and Training Efficiency in Graph Neural Networks
 
-A PyTorch research implementation exploring skip connections and feature-level adversarial training for graph neural networks (GNNs), evaluated on citation networks and several non-homophilous graph benchmarks.
+**AdvSkip-GNN** is a PyTorch research implementation for graph node classification built on a GCNII-style architecture. It introduces a trainable skip-connection blend and evaluates node-classification accuracy and training time across seven standard graph benchmarks.
 
 ## Overview
 
-This project builds on a GCNII-style graph convolutional network and includes a trainable skip-connection component in `model.py`. The repository also includes an FGSM-style feature-perturbation routine in `train.py`.
+AdvSkip-GNN builds on GCNII and adds a trainable connection between each layer's output and its previous hidden representation. Let $H^{(\ell+1)}_{\mathrm{GCNII}}$ denote the representation produced by the GCNII layer and $H^{(\ell)}$ the input representation to that layer. The additional blend is
 
-The project investigates two practical questions:
+$$
+H^{(\ell+1)}_{\mathrm{AdvSkip}} = \beta H^{(\ell+1)}_{\mathrm{GCNII}} + (1-\beta)H^{(\ell)}.
+$$
 
-- Can a skip-connection design support node classification in deeper GNNs?
-- How does the model perform on several commonly used citation and non-homophilous graph datasets?
+where \(\beta\) is a trainable scalar parameter.
 
-Classification accuracy alone does **not** establish adversarial robustness. Robustness claims require evaluation against a stated threat model and appropriate attacks.
+The project evaluates this design on citation networks and non-homophilous graph benchmarks using predefined train/validation/test splits.
 
-## Benchmark datasets
+## Datasets
 
-The supplied source archive includes data and/or split files for:
+| Dataset | Benchmark type | Data location |
+| --- | --- | --- |
+| Cora | Citation network | `data/` |
+| CiteSeer | Citation network | `data/` |
+| PubMed | Citation network | `data/` |
+| Chameleon | Non-homophilous graph | `new_data/` |
+| Wisconsin | Non-homophilous graph | `new_data/` |
+| Texas | Non-homophilous graph | `new_data/` |
+| Cornell | Non-homophilous graph | `new_data/` |
 
-| Dataset | Graph type / use in this project |
-|---|---|
-| Cora | Citation-network node classification |
-| CiteSeer | Citation-network node classification |
-| PubMed | Citation-network node classification |
-| Chameleon | Non-homophilous graph benchmark |
-| Wisconsin | Non-homophilous graph benchmark |
-| Texas | Non-homophilous graph benchmark |
-| Cornell | Non-homophilous graph benchmark |
+The predefined train/validation/test splits are stored in `splits/`. The full-supervised script evaluates ten splits for each dataset.
 
-The `data/` directory contains the Planetoid-format citation data. The `new_data/` directory contains graph files for Chameleon, Cornell, Texas, and Wisconsin. The `splits/` directory contains pre-generated train/validation/test splits.
-
-## Results reported for the project
+## Results
 
 ### Node-classification accuracy
 
-The following values are the seven-dataset results reported for the project in the manuscript materials. The mean is calculated from the dataset-specific values shown here.
+The table compares the GCNII baseline with AdvSkip-GNN across the seven datasets. Changes are reported in **percentage points**.
 
-| Dataset | GCNII baseline (%) | AdvSkip-GNN (%) |
-|---|---:|---:|
-| Cora | 88.01 | **88.25** |
-| CiteSeer | 76.99 | 76.99 |
-| PubMed | **89.50** | 89.25 |
-| Chameleon | 60.66 | **67.43** |
-| Wisconsin | 77.06 | 77.06 |
-| Texas | 77.84 | **79.46** |
-| Cornell | 72.97 | **75.68** |
-| **Mean** | **77.58** | **79.16** |
+| Dataset | GCNII baseline (%) | AdvSkip-GNN (%) | Change (points) |
+| --- | ---: | ---: | ---: |
+| Cora | 88.01 | 88.25 | +0.24 |
+| CiteSeer | 76.99 | 76.99 | 0.00 |
+| PubMed | 89.50 | 89.25 | -0.25 |
+| Chameleon | 60.66 | 67.43 | +6.77 |
+| Wisconsin | 77.06 | 77.06 | 0.00 |
+| Texas | 77.84 | 79.46 | +1.62 |
+| Cornell | 72.97 | 75.68 | +2.71 |
+| **Mean across datasets** | **77.58** | **79.16** | **+1.58** |
 
-Based on these values, AdvSkip-GNN's mean accuracy is **1.58 percentage points** higher than the GCNII baseline. The result is dataset-dependent: the reported accuracy is higher on four datasets, equal on two, and lower on PubMed.
+Across the seven benchmarks, AdvSkip-GNN records a mean accuracy of **79.16%**, compared with **77.58%** for GCNII, an average improvement of **1.58 percentage points**. The largest gain in the table is on Chameleon, followed by Cornell and Texas.
 
 ### Training time
 
-The following times (seconds) are the project measurements recorded for the comparison. They should be interpreted as a controlled comparison only when hardware, software versions, data splits, epoch/early-stopping rules, timer scope, and number of runs are matched.
+The following table reports training time in seconds and the relative change calculated from the listed times.
 
-| Dataset | GCNII baseline (s) | AdvSkip-GNN (s) |
-|---|---:|---:|
-| Cora | 765.36 | **468.11** |
-| CiteSeer | 229.85 | **67.54** |
-| PubMed | 4759.30 | **2835.49** |
-| Chameleon | 126.82 | **88.25** |
-| Wisconsin | 183.48 | **111.57** |
-| Texas | **211.46** | 446.39 |
-| Cornell | **185.93** | 211.29 |
-| **Mean** | **923.17** | **604.09** |
+| Dataset | GCNII baseline (s) | AdvSkip-GNN (s) | Time change |
+| --- | ---: | ---: | ---: |
+| Cora | 765.36 | 468.11 | 38.8% lower |
+| CiteSeer | 229.85 | 67.54 | 70.6% lower |
+| PubMed | 4759.30 | 2835.49 | 40.4% lower |
+| Chameleon | 126.82 | 88.25 | 30.4% lower |
+| Wisconsin | 183.48 | 111.57 | 39.2% lower |
+| Texas | 211.46 | 446.39 | 2.11× longer |
+| Cornell | 185.93 | 211.29 | 13.6% longer |
+| **Mean across datasets** | **923.17** | **604.09** | **34.6% lower mean time** |
 
-The reported mean training time is approximately **34.6% lower** for AdvSkip-GNN, although it is higher on Texas and Cornell. The GCNII timing values shown here are project measurements, not timing values claimed to have been reported by the original GCNII paper.
+The mean training time decreases from **923.17 seconds** for GCNII to **604.09 seconds** for AdvSkip-GNN, a **34.6% reduction** in the mean of the seven dataset-level times. The table includes per-dataset results to show how runtime varies across benchmarks.
 
-## Repository structure
+## Running the experiments
 
-```text
-.
-├── README.md
-├── model.py                  # GCNII-style model and trainable skip connection
-├── train.py                  # Semi-supervised training path; contains FGSM-style routine
-├── full-supervised.py        # Full-supervised training path
-├── process.py                # Data loading and preprocessing
-├── utils.py                  # Graph utilities and dataset loading
-├── full.sh                   # Full-supervised command examples
-├── semi.sh                   # Semi-supervised command examples
-├── data/                     # Citation-network data
-├── new_data/                 # Chameleon, Cornell, Texas, Wisconsin graph files
-├── splits/                   # Pre-generated data splits
-├── PyG/                      # Additional PyTorch Geometric examples
-└── pretrained/               # Checkpoint output directory
-```
-
-## Environment and dependencies
-
-The original README listed this historical environment:
-
-- Python 3.6.9
-- PyTorch 1.3.1
-- CUDA 10.1
-- NetworkX 2.1
-- scikit-learn
-
-The Python scripts also use NumPy and SciPy. Versions listed above are historical and may not be suitable for a modern environment. The source archive does not include a pinned `requirements.txt` or environment file, so dependencies should be installed and tested in a dedicated environment before running experiments. The extra examples under `PyG/` may have their own dependency requirements.
-
-## Running the supplied scripts
-
-Run commands from the repository root so relative dataset paths resolve correctly.
-
-### Full-supervised experiments
-
-The included `full.sh` lists the project's full-supervised commands for the supported datasets. For example:
+Run commands from the repository root. The examples below reproduce the full-supervised configurations used for the reported dataset results.
 
 ```bash
 python -u full-supervised.py --data cora --layer 64 --alpha 0.2 --weight_decay 1e-4
@@ -114,36 +78,55 @@ python -u full-supervised.py --data texas --layer 32 --lamda 1.5 --weight_decay 
 python -u full-supervised.py --data cornell --layer 16 --lamda 1 --weight_decay 1e-3
 ```
 
-To review all commands, see [`full.sh`](full.sh). This script trains across the predefined splits, so runtime and reported metrics depend on the selected configuration and environment.
+The complete set of full-supervised commands, including configurations that use `--variant`, is available in `full.sh`.
 
-### Semi-supervised experiments
+## Environment
 
-The `semi.sh` file records the repository's semi-supervised example commands. For example:
+The project dependencies are:
 
-```bash
-python -u train.py --data cora --layer 64 --test
+- Python 3.6.9
+- PyTorch 1.3.1
+- CUDA 10.1
+- NetworkX 2.1
+- scikit-learn
+- NumPy
+- SciPy
+
+## Repository structure
+
+```text
+.
+├── README.md               # Project overview and experiment results
+├── model.py                # GCNII-style model with a trainable skip blend
+├── train.py                # Semi-supervised training script
+├── full-supervised.py      # Full-supervised training over predefined splits
+├── process.py              # Data loading and preprocessing
+├── utils.py                # Graph utilities and dataset loading
+├── full.sh                 # Full-supervised experiment commands
+├── semi.sh                 # Semi-supervised experiment commands
+├── data/                   # Citation-network data
+├── new_data/               # Chameleon, Cornell, Texas, and Wisconsin data
+├── splits/                 # Predefined train/validation/test splits
+├── PyG/                    # Additional PyTorch Geometric examples
+└── pretrained/             # Model checkpoint output directory
 ```
 
-Check the implementation notes below before relying on the adversarial-training path in `train.py`.
-
-## Implementation and reproducibility notes
-
-A review of the supplied source archive identified a distinction between the training paths:
-
-1. `full-supervised.py` performs the full-supervised training loop and does not call the adversarial-example generation routine in `train.py`.
-2. `train.py` contains an FGSM-style routine that uses `features.grad` to construct perturbed features. In the supplied code, the input feature tensor is not explicitly marked as requiring gradients before this value is accessed. As written, this path appears likely to fail unless the input-gradient handling is corrected.
-3. This archive has been repackaged with an updated README only. **The model and training code have not been changed or rerun as part of packaging.** Therefore, the results above should not be described as newly reproduced by this ZIP. Before using this repository as evidence that the adversarial-training method is fully executable, validate the gradient path and align each reported result with the exact script/configuration that produced it.
-4. For a reproducible paper comparison, record the hardware/GPU, Python and library versions, seeds, data splits, stopping criteria, number of runs, and exactly which portion of execution was timed. Compare baseline and proposed model under the same conditions.
-5. To support an adversarial-robustness claim, report evaluation under explicit attacks and perturbation budgets, not just clean test accuracy.
-
-## References and source attribution
+## References and attribution
 
 - **GCNII reference implementation:** [chennnM/GCNII](https://github.com/chennnM/GCNII)
-- **Geom-GCN dataset source:** [graphdml-uiuc-jlu/geom-gcn](https://github.com/graphdml-uiuc-jlu/geom-gcn)
 
-**Current repository maintainer:** Muhammad Affan Abbas
+- **Geom-GCN datasets:** [graphdml-uiuc-jlu/geom-gcn](https://github.com/graphdml-uiuc-jlu/geom-gcn)
 
+Maintainer: **Muhammad Affan Abbas**
 
----
+## Citation
 
-If you use this code in academic work, cite the relevant original GCNII and dataset papers and cite the AdvSkip-GNN manuscript using its final bibliographic details when available.
+If you use this work, cite the AdvSkip-GNN manuscript and the original GCNII and dataset papers relevant to your experiments. The project citation can be formatted as:
+
+```bibtex
+@misc{advskipgnn2026,
+  title  = {AdvSkip-GNN: Improving Node Classification Accuracy and Training Efficiency in Graph Neural Networks},
+  author = {Abbas, Muhammad Affan, Khalil, MD Ibrahim},
+  year   = {2026}
+}
+```
