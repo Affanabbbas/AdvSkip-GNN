@@ -10,7 +10,7 @@ $$
 H^{(\ell+1)}_{\mathrm{AdvSkip}} = \beta H^{(\ell+1)}_{\mathrm{GCNII}} + (1-\beta)H^{(\ell)}.
 $$
 
-where \(\beta\) is a trainable scalar parameter.
+where $\beta$ is a trainable scalar parameter.
 
 The project evaluates this design on citation networks and non-homophilous graph benchmarks using predefined train/validation/test splits.
 
