@@ -2,8 +2,6 @@
 
 A PyTorch research implementation exploring skip connections and feature-level adversarial training for graph neural networks (GNNs), evaluated on citation networks and several non-homophilous graph benchmarks.
 
-> **Research note:** The accuracy and runtime tables below transcribe results previously reported for this project; they were **not rerun while preparing this repository archive**. See [Implementation and reproducibility notes](#implementation-and-reproducibility-notes) before interpreting them as results reproducible from every script in this snapshot.
-
 ## Overview
 
 This project builds on a GCNII-style graph convolutional network and includes a trainable skip-connection component in `model.py`. The repository also includes an FGSM-style feature-perturbation routine in `train.py`.
